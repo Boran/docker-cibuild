@@ -1,0 +1,1 @@
+jenkins ALL=NOPASSWD: /home/builder/drupal-ci/site-build.sh *
