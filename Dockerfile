@@ -51,7 +51,7 @@ ADD ./files/supervisord.d    /etc/supervisord.d
 
 # Expose volumes
 VOLUME /home/builder
-VOLUME /opt/ansible
+#VOLUME /opt/ansible
 VOLUME /var/log
 
 WORKDIR /home/builder
