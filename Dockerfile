@@ -46,19 +46,24 @@ RUN php codecept.phar bootstrap
 ADD ./files/ansible/hosts /etc/ansible/hosts
 ADD ./files/etc/vim/vimrc /etc/vim/vimrc
 
+# allow jenkins user sudo on build script
+ADD ./files/etc/sudoers.d/jenkins /etc/sudoers.d/jenkins
+
 # SSH startup
 ADD ./files/supervisord.d    /etc/supervisord.d
 
 # Expose volumes
 VOLUME /home/builder
-#VOLUME /opt/ansible
 VOLUME /var/log
 
 WORKDIR /home/builder
 EXPOSE 22 80 
-## dont overrise start.sh, use the one in boran/drupal
+
+## dont override start.sh, use the one in boran/drupal
 #ADD ./start.sh /start.sh
 #RUN chmod 755 /start.sh 
 #CMD ["/bin/bash", "/start.sh"]
 
+ADD ./custom.sh /custom.sh
+RUN chmod 755 /custom.sh
 
