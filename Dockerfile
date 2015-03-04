@@ -4,7 +4,7 @@
 #
 FROM             boran/drupal
 MAINTAINER       Sean Boran <sean_at_boran.com>
-ENV REFRESHED_AT 2014-12-15
+ENV REFRESHED_AT 2015-03-04
 
 # Drupal start.sh: install dependancies, but not drupal
 ENV DRUPAL_NONE skip
@@ -20,8 +20,10 @@ RUN apt-get -qqy update && \
     mkdir -p /var/run/sshd
 
 
-# Add user jenkins
-RUN useradd -m -U -d /home/builder -c 'Automated CI user' --shell /bin/bash jenkins
+# Add user jenkins, add to the 999(docker) group for later
+RUN useradd -m -U -d /home/builder -c 'Automated CI user' --shell /bin/bash jenkins && \
+   groupadd -g 999 docker && \
+   usermod -a -G docker jenkins
 # Set password for the jenkins user 
 #RUN echo "jenkins:jenkins" | chpasswd
 
@@ -32,16 +34,15 @@ RUN apt-get -qy install python-mysqldb python-setuptools python-dev libgmp-dev p
 # python-pycryptopp ?
 RUN easy_install pip
 RUN pip install --quiet -I pycrypto
-RUN pip install --quiet paramiko PyYAML jinja2 httplib2 markupsafe
-RUN pip install --quiet ansible
+RUN pip install --quiet paramiko PyYAML jinja2 httplib2 markupsafe ansible
 
 # http://codeception.com/install
 RUN mkdir /opt/codecept
-ADD http://codeception.com/codecept.phar /opt/codecept/codecept.phar
-RUN chmod 755 /opt/codecept/codecept.phar
-RUN ln -s /opt/codecept/codecept.phar /usr/bin/codecept
 WORKDIR /opt/codecept
-RUN php codecept.phar bootstrap
+ADD http://codeception.com/codecept.phar /opt/codecept/codecept.phar
+RUN chmod 755 /opt/codecept/codecept.phar && \
+    ln -s /opt/codecept/codecept.phar /usr/bin/codecept && \
+    php codecept.phar bootstrap
 
 ADD ./files/ansible/hosts /etc/ansible/hosts
 ADD ./files/etc/vim/vimrc /etc/vim/vimrc
